@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"net/http"
 
+	httpSwagger "github.com/swaggo/http-swagger"
+	"github.com/xkarasb/blog/docs"
 	"github.com/xkarasb/blog/internal/core/repository"
 	"github.com/xkarasb/blog/internal/core/service"
 	"github.com/xkarasb/blog/internal/transport/http/middlewares"
 	"github.com/xkarasb/blog/internal/transport/http/routers"
 	"github.com/xkarasb/blog/pkg/db/postgres"
+	// Your module name + /docs
 )
 
 type HttpServerConfig struct {
@@ -21,7 +24,7 @@ type HttpServer struct {
 	http *http.Server
 }
 
-func NewHttpServer(cfg *HttpServerConfig, db *postgres.DB) *HttpServer {
+func NewHttpServer(cfg *HttpServerConfig, db *postgres.DB, isDoc bool) *HttpServer {
 	apiRouter := http.NewServeMux()
 
 	dbRepo := repository.NewBlogRepository(db)
@@ -46,6 +49,15 @@ func NewHttpServer(cfg *HttpServerConfig, db *postgres.DB) *HttpServer {
 		Addr: fmt.Sprintf("%s:%d", cfg.Address, cfg.Port),
 	}
 
+	if isDoc {
+		docs.SwaggerInfo.Title = "CPC Blog API"
+		docs.SwaggerInfo.Description = "This is API CPC Blog server"
+		docs.SwaggerInfo.Version = "1.0"
+		docs.SwaggerInfo.Host = server.Addr
+		docs.SwaggerInfo.BasePath = "/api"
+
+		http.Handle("/swagger/", httpSwagger.WrapHandler)
+	}
 	fmt.Println(server.Addr)
 
 	return &HttpServer{

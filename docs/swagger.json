@@ -1,0 +1,459 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/api/auth/login": {
+            "post": {
+                "description": "Login a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login",
+                "parameters": [
+                    {
+                        "description": "Login data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserLoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/UserLoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Incorrect body"
+                    },
+                    "403": {
+                        "description": "Email or password incorrect"
+                    }
+                }
+            }
+        },
+        "/api/auth/refresh-token": {
+            "post": {
+                "description": "Get access token by refresh token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Invoke refresh token",
+                "parameters": [
+                    {
+                        "description": "Refresh token data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TokenRefreshRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/TokenRefreshResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Incorrect body\\nRefresh token expired or incorrect"
+                    }
+                }
+            }
+        },
+        "/api/auth/register": {
+            "post": {
+                "description": "Registrate a new user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Registration",
+                "parameters": [
+                    {
+                        "description": "Registration data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserRegistrationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/UserRegistrationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Incorrect email format\\nIncorrect body"
+                    },
+                    "403": {
+                        "description": "User alredy exsist"
+                    }
+                }
+            }
+        },
+        "/api/post/{postId}": {
+            "put": {
+                "description": "Edit post",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Poster"
+                ],
+                "parameters": [
+                    {
+                        "description": "Edit post data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/EditPostRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Post ID",
+                        "name": "postId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/PostDetails"
+                        }
+                    },
+                    "400": {
+                        "description": "Incorrect body\\nRefresh token expired or incorrect"
+                    },
+                    "403": {
+                        "description": "Access denied"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                }
+            }
+        },
+        "/api/post/{postId}/status": {
+            "patch": {
+                "description": "Publish post",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Poster"
+                ],
+                "summary": "Publicate post",
+                "parameters": [
+                    {
+                        "description": "Publish post data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UpdatePostStatusRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Post ID",
+                        "name": "postId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/PostDetails"
+                        }
+                    },
+                    "400": {
+                        "description": "Incorrect body\\nRefresh token expired or incorrect"
+                    },
+                    "403": {
+                        "description": "Access denied"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                }
+            }
+        },
+        "/api/posts": {
+            "get": {
+                "description": "Read all posts",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reader"
+                ],
+                "summary": "Read post",
+                "responses": {
+                    "200": {
+                        "description": "aga"
+                    },
+                    "400": {
+                        "description": "Incorrect body\\nRefresh token expired or incorrect"
+                    },
+                    "403": {
+                        "description": "Access denied"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                }
+            },
+            "post": {
+                "description": "Create new post",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Poster"
+                ],
+                "summary": "Create post",
+                "parameters": [
+                    {
+                        "description": "Create post data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CreatePostRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/CreatePostResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Incorrect body"
+                    },
+                    "403": {
+                        "description": "Incorrect user"
+                    },
+                    "409": {
+                        "description": "Idempotency key already used"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "CreatePostRequest": {
+            "description": "Request payload for creating a new post",
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "idempotency_key": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "CreatePostResponse": {
+            "description": "Response with ID of the created post",
+            "type": "object",
+            "properties": {
+                "post_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "EditPostRequest": {
+            "description": "Request payload for editing a post",
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "PostDetails": {
+            "description": "Response with updated post details",
+            "type": "object",
+            "properties": {
+                "author_id": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "indempotency_key": {
+                    "type": "string"
+                },
+                "post_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/TypePostStatus"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "TokenRefreshRequest": {
+            "description": "Request to refresh access token using refresh token",
+            "type": "object",
+            "properties": {
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "TokenRefreshResponse": {
+            "description": "Response with new access token",
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "TypePostStatus": {
+            "type": "string",
+            "enum": [
+                "draft",
+                "published"
+            ],
+            "x-enum-varnames": [
+                "DraftStatus",
+                "PublishedStatus"
+            ]
+        },
+        "UpdatePostStatusRequest": {
+            "description": "Request to change post status (publish/unpublish)",
+            "type": "object",
+            "properties": {
+                "status": {
+                    "$ref": "#/definitions/TypePostStatus"
+                }
+            }
+        },
+        "UserLoginRequest": {
+            "description": "Request payload for user authentication",
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "UserLoginResponse": {
+            "description": "Response with authentication tokens after login",
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "UserRegistrationRequest": {
+            "description": "Request payload for registering a new user",
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                }
+            }
+        },
+        "UserRegistrationResponse": {
+            "description": "Response with authentication tokens after registration",
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

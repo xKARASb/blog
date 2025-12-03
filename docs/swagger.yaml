@@ -1,0 +1,302 @@
+definitions:
+  CreatePostRequest:
+    description: Request payload for creating a new post
+    properties:
+      content:
+        type: string
+      idempotency_key:
+        type: string
+      title:
+        type: string
+    type: object
+  CreatePostResponse:
+    description: Response with ID of the created post
+    properties:
+      post_id:
+        type: string
+    type: object
+  EditPostRequest:
+    description: Request payload for editing a post
+    properties:
+      content:
+        type: string
+      title:
+        type: string
+    type: object
+  PostDetails:
+    description: Response with updated post details
+    properties:
+      author_id:
+        type: string
+      content:
+        type: string
+      created_at:
+        type: string
+      indempotency_key:
+        type: string
+      post_id:
+        type: string
+      status:
+        $ref: '#/definitions/TypePostStatus'
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  TokenRefreshRequest:
+    description: Request to refresh access token using refresh token
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  TokenRefreshResponse:
+    description: Response with new access token
+    properties:
+      access_token:
+        type: string
+    type: object
+  TypePostStatus:
+    enum:
+    - draft
+    - published
+    type: string
+    x-enum-varnames:
+    - DraftStatus
+    - PublishedStatus
+  UpdatePostStatusRequest:
+    description: Request to change post status (publish/unpublish)
+    properties:
+      status:
+        $ref: '#/definitions/TypePostStatus'
+    type: object
+  UserLoginRequest:
+    description: Request payload for user authentication
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  UserLoginResponse:
+    description: Response with authentication tokens after login
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+      user_id:
+        type: string
+    type: object
+  UserRegistrationRequest:
+    description: Request payload for registering a new user
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+    type: object
+  UserRegistrationResponse:
+    description: Response with authentication tokens after registration
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+      user_id:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login a user
+      parameters:
+      - description: Login data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/UserLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserLoginResponse'
+        "400":
+          description: Incorrect body
+        "403":
+          description: Email or password incorrect
+      summary: Login
+      tags:
+      - Auth
+  /api/auth/refresh-token:
+    post:
+      consumes:
+      - application/json
+      description: Get access token by refresh token
+      parameters:
+      - description: Refresh token data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/TokenRefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TokenRefreshResponse'
+        "400":
+          description: Incorrect body\nRefresh token expired or incorrect
+      summary: Invoke refresh token
+      tags:
+      - Auth
+  /api/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Registrate a new user
+      parameters:
+      - description: Registration data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/UserRegistrationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserRegistrationResponse'
+        "400":
+          description: Incorrect email format\nIncorrect body
+        "403":
+          description: User alredy exsist
+      summary: Registration
+      tags:
+      - Auth
+  /api/post/{postId}:
+    put:
+      consumes:
+      - application/json
+      description: Edit post
+      parameters:
+      - description: Edit post data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/EditPostRequest'
+      - description: Post ID
+        format: uuid
+        in: path
+        name: postId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/PostDetails'
+        "400":
+          description: Incorrect body\nRefresh token expired or incorrect
+        "403":
+          description: Access denied
+        "404":
+          description: Post not found
+      tags:
+      - Poster
+  /api/post/{postId}/status:
+    patch:
+      consumes:
+      - application/json
+      description: Publish post
+      parameters:
+      - description: Publish post data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/UpdatePostStatusRequest'
+      - description: Post ID
+        format: uuid
+        in: path
+        name: postId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/PostDetails'
+        "400":
+          description: Incorrect body\nRefresh token expired or incorrect
+        "403":
+          description: Access denied
+        "404":
+          description: Post not found
+      summary: Publicate post
+      tags:
+      - Poster
+  /api/posts:
+    get:
+      consumes:
+      - application/json
+      description: Read all posts
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: aga
+        "400":
+          description: Incorrect body\nRefresh token expired or incorrect
+        "403":
+          description: Access denied
+        "404":
+          description: Post not found
+      summary: Read post
+      tags:
+      - Reader
+    post:
+      consumes:
+      - application/json
+      description: Create new post
+      parameters:
+      - description: Create post data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/CreatePostRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/CreatePostResponse'
+        "400":
+          description: Incorrect body
+        "403":
+          description: Incorrect user
+        "409":
+          description: Idempotency key already used
+      summary: Create post
+      tags:
+      - Poster
+swagger: "2.0"

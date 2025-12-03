@@ -29,6 +29,17 @@ func (c *PosterController) AddImageHandler(w http.ResponseWriter, r *http.Reques
 	fmt.Fprintf(w, "Poster %s %s\n", r.Method, r.URL)
 }
 
+// @Description	Edit post
+// @Tags			Poster
+// @Accept			json
+// @Produce		json
+// @Param			request	body		dto.EditPostRequest	true	"Edit post data"
+// @Param			postId	path		string				true	"Post ID"	format(uuid)
+// @Success		200		{object}	dto.EditPostResponse
+// @Failure		400		"Incorrect body\nRefresh token expired or incorrect"
+// @Failure		403		"Access denied"
+// @Failure		404		"Post not found"
+// @Router			/api/post/{postId} [put]“
 func (c *PosterController) EditPostHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user, ok := ctx.Value(types.CtxUser).(*dto.UserDB)
@@ -78,6 +89,18 @@ func (c *PosterController) DeleteImageHandler(w http.ResponseWriter, r *http.Req
 	fmt.Fprintf(w, "Poster %s %s\n", r.Method, r.URL)
 }
 
+// @Summary		Publicate post
+// @Description	Publish post
+// @Tags			Poster
+// @Accept			json
+// @Produce		json
+// @Param			request	body		dto.PublishPostRequest	true	"Publish post data"
+// @Param			postId	path		string					true	"Post ID"	format(uuid)
+// @Success		200		{object}	dto.EditPostResponse
+// @Failure		400		"Incorrect body\nRefresh token expired or incorrect"
+// @Failure		403		"Access denied"
+// @Failure		404		"Post not found"
+// @Router			/api/post/{postId}/status [patch]“
 func (c *PosterController) PublishHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user, ok := ctx.Value(types.CtxUser).(*dto.UserDB)

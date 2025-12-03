@@ -31,7 +31,7 @@ func (s *PosterService) EditPost(userId, postId uuid.UUID, post *dto.EditPostReq
 		return nil, errors.ErrorServiceNoAccess
 	}
 
-	postDB, err = s.rep.UpdatePost(postId, post.Title, post.Contenct, postDB.Status)
+	postDB, err = s.rep.UpdatePost(postId, post.Title, post.Content, postDB.Status)
 	if err != nil {
 		return nil, err
 	}

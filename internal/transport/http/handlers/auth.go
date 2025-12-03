@@ -23,6 +23,17 @@ type AuthController struct {
 func NewAuthController(service AuthService) *AuthController {
 	return &AuthController{service: service}
 }
+
+// @Summary		Registration
+// @Description	Registrate a new user
+// @Tags			Auth
+// @Accept			json
+// @Produce		json
+// @Param			request	body		dto.RegistrateUserRequest	true	"Registration data"
+// @Success		200		{object}	dto.RegistrateUserResponse
+// @Failure		403		"User alredy exsist"
+// @Failure		400		"Incorrect email format\nIncorrect body"
+// @Router			/api/auth/register [post]
 func (c *AuthController) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	reqUser := &dto.RegistrateUserRequest{}
 	if err := json.NewDecoder(r.Body).Decode(reqUser); err != nil {
@@ -45,6 +56,16 @@ func (c *AuthController) RegisterHandler(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode(resp)
 }
 
+// @Summary		Login
+// @Description	Login a user
+// @Tags			Auth
+// @Accept			json
+// @Produce		json
+// @Param			request	body		dto.LoginUserRequest	true	"Login data"
+// @Success		200		{object}	dto.LoginUserResponse
+// @Failure		400		"Incorrect body"
+// @Failure		403		"Email or password incorrect"
+// @Router			/api/auth/login [post]
 func (c *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	reqUser := &dto.LoginUserRequest{}
 	if err := json.NewDecoder(r.Body).Decode(reqUser); err != nil {
@@ -69,6 +90,15 @@ func (c *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(resp)
 }
 
+// @Summary		Invoke refresh token
+// @Description	Get access token by refresh token
+// @Tags			Auth
+// @Accept			json
+// @Produce		json
+// @Param			request	body		dto.RefreshRequest	true	"Refresh token data"
+// @Success		200		{object}	dto.RefreshResponse
+// @Failure		400		"Incorrect body\nRefresh token expired or incorrect"
+// @Router			/api/auth/refresh-token [post]
 func (c *AuthController) RefreshHandler(w http.ResponseWriter, r *http.Request) {
 	req := &dto.RefreshRequest{}
 	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
