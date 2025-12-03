@@ -2,11 +2,11 @@ package handlers
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/google/uuid"
+	json "github.com/mailru/easyjson"
 	"github.com/xkarasb/blog/internal/core/dto"
 	"github.com/xkarasb/blog/pkg/errors"
 	"github.com/xkarasb/blog/pkg/types"
@@ -49,7 +49,7 @@ func (c *PosterController) EditPostHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	reqPost := &dto.EditPostRequest{}
-	if err := json.NewDecoder(r.Body).Decode(reqPost); err != nil {
+	if err := json.UnmarshalFromReader(r.Body, reqPost); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintln(w, "Incorrect body")
 		return
@@ -82,7 +82,7 @@ func (c *PosterController) EditPostHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(resPost)
+	json.MarshalToHTTPResponseWriter(resPost, w)
 }
 
 func (c *PosterController) DeleteImageHandler(w http.ResponseWriter, r *http.Request) {
@@ -110,7 +110,7 @@ func (c *PosterController) PublishHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 	reqPost := &dto.PublishPostRequest{}
-	if err := json.NewDecoder(r.Body).Decode(reqPost); err != nil {
+	if err := json.UnmarshalFromReader(r.Body, reqPost); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintln(w, "Incorrect body")
 		return
@@ -145,5 +145,5 @@ func (c *PosterController) PublishHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(resPost)
+	json.MarshalToHTTPResponseWriter(resPost, w)
 }

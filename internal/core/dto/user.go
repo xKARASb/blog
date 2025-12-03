@@ -7,6 +7,7 @@ import (
 	"github.com/xkarasb/blog/pkg/types"
 )
 
+// easyjson:skip
 // @Description	UserDB represent user from data base
 type UserDB struct {
 	UserId                 uuid.UUID  `json:"user_id" db:"user_id"`

@@ -1,9 +1,10 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
+
+	json "github.com/mailru/easyjson"
 
 	"github.com/xkarasb/blog/internal/core/dto"
 	"github.com/xkarasb/blog/pkg/errors"
@@ -36,7 +37,8 @@ func NewAuthController(service AuthService) *AuthController {
 // @Router			/api/auth/register [post]
 func (c *AuthController) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	reqUser := &dto.RegistrateUserRequest{}
-	if err := json.NewDecoder(r.Body).Decode(reqUser); err != nil {
+
+	if err := json.UnmarshalFromReader(r.Body, reqUser); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintln(w, "Incorrect body")
 		return
@@ -53,7 +55,7 @@ func (c *AuthController) RegisterHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(resp)
+	json.MarshalToHTTPResponseWriter(resp, w)
 }
 
 // @Summary		Login
@@ -68,7 +70,7 @@ func (c *AuthController) RegisterHandler(w http.ResponseWriter, r *http.Request)
 // @Router			/api/auth/login [post]
 func (c *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	reqUser := &dto.LoginUserRequest{}
-	if err := json.NewDecoder(r.Body).Decode(reqUser); err != nil {
+	if err := json.UnmarshalFromReader(r.Body, reqUser); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintln(w, "Incorrect body")
 		return
@@ -87,7 +89,7 @@ func (c *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(resp)
+	json.MarshalToHTTPResponseWriter(resp, w)
 }
 
 // @Summary		Invoke refresh token
@@ -101,7 +103,7 @@ func (c *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 // @Router			/api/auth/refresh-token [post]
 func (c *AuthController) RefreshHandler(w http.ResponseWriter, r *http.Request) {
 	req := &dto.RefreshRequest{}
-	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+	if err := json.UnmarshalFromReader(r.Body, req); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintln(w, "Incorrect body")
 		return
@@ -120,5 +122,5 @@ func (c *AuthController) RefreshHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(resp)
+	json.MarshalToHTTPResponseWriter(resp, w)
 }

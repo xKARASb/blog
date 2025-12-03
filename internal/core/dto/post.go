@@ -8,6 +8,8 @@ import (
 )
 
 // @Description	Post database model with all fields
+//
+//easyjson:skip
 type PostDB struct {
 	PostId         uuid.UUID        `json:"post_id" db:"post_id"`
 	AuthorId       uuid.UUID        `json:"author_id" db:"author_id"`
