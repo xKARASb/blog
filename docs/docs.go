@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/auth/login": {
+        "/auth/login": {
             "post": {
                 "description": "Login a user",
                 "consumes": [
@@ -55,7 +55,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/auth/refresh-token": {
+        "/auth/refresh-token": {
             "post": {
                 "description": "Get access token by refresh token",
                 "consumes": [
@@ -92,7 +92,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/auth/register": {
+        "/auth/register": {
             "post": {
                 "description": "Registrate a new user",
                 "consumes": [
@@ -132,8 +132,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/post/{postId}": {
+        "/post/{postId}": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Edit post",
                 "consumes": [
                     "application/json"
@@ -182,8 +187,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/post/{postId}/status": {
+        "/post/{postId}/status": {
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Publish post",
                 "consumes": [
                     "application/json"
@@ -233,8 +243,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/posts": {
+        "/posts": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Read all posts",
                 "consumes": [
                     "application/json"
@@ -262,6 +277,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create new post",
                 "consumes": [
                     "application/json"
@@ -465,6 +485,14 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Enter: Bearer {jwt_token}",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

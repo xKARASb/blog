@@ -34,7 +34,7 @@ func NewAuthController(service AuthService) *AuthController {
 // @Success		200		{object}	dto.RegistrateUserResponse
 // @Failure		403		"User alredy exsist"
 // @Failure		400		"Incorrect email format\nIncorrect body"
-// @Router			/api/auth/register [post]
+// @Router			/auth/register [post]
 func (c *AuthController) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	reqUser := &dto.RegistrateUserRequest{}
 
@@ -67,7 +67,7 @@ func (c *AuthController) RegisterHandler(w http.ResponseWriter, r *http.Request)
 // @Success		200		{object}	dto.LoginUserResponse
 // @Failure		400		"Incorrect body"
 // @Failure		403		"Email or password incorrect"
-// @Router			/api/auth/login [post]
+// @Router			/auth/login [post]
 func (c *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	reqUser := &dto.LoginUserRequest{}
 	if err := json.UnmarshalFromReader(r.Body, reqUser); err != nil {
@@ -100,7 +100,7 @@ func (c *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 // @Param			request	body		dto.RefreshRequest	true	"Refresh token data"
 // @Success		200		{object}	dto.RefreshResponse
 // @Failure		400		"Incorrect body\nRefresh token expired or incorrect"
-// @Router			/api/auth/refresh-token [post]
+// @Router			/auth/refresh-token [post]
 func (c *AuthController) RefreshHandler(w http.ResponseWriter, r *http.Request) {
 	req := &dto.RefreshRequest{}
 	if err := json.UnmarshalFromReader(r.Body, req); err != nil {

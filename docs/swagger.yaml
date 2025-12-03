@@ -110,7 +110,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /api/auth/login:
+  /auth/login:
     post:
       consumes:
       - application/json
@@ -136,7 +136,7 @@ paths:
       summary: Login
       tags:
       - Auth
-  /api/auth/refresh-token:
+  /auth/refresh-token:
     post:
       consumes:
       - application/json
@@ -160,7 +160,7 @@ paths:
       summary: Invoke refresh token
       tags:
       - Auth
-  /api/auth/register:
+  /auth/register:
     post:
       consumes:
       - application/json
@@ -186,7 +186,7 @@ paths:
       summary: Registration
       tags:
       - Auth
-  /api/post/{postId}:
+  /post/{postId}:
     put:
       consumes:
       - application/json
@@ -217,9 +217,11 @@ paths:
           description: Access denied
         "404":
           description: Post not found
+      security:
+      - BearerAuth: []
       tags:
       - Poster
-  /api/post/{postId}/status:
+  /post/{postId}/status:
     patch:
       consumes:
       - application/json
@@ -250,10 +252,12 @@ paths:
           description: Access denied
         "404":
           description: Post not found
+      security:
+      - BearerAuth: []
       summary: Publicate post
       tags:
       - Poster
-  /api/posts:
+  /posts:
     get:
       consumes:
       - application/json
@@ -269,6 +273,8 @@ paths:
           description: Access denied
         "404":
           description: Post not found
+      security:
+      - BearerAuth: []
       summary: Read post
       tags:
       - Reader
@@ -296,7 +302,15 @@ paths:
           description: Incorrect user
         "409":
           description: Idempotency key already used
+      security:
+      - BearerAuth: []
       summary: Create post
       tags:
       - Poster
+securityDefinitions:
+  BearerAuth:
+    description: 'Enter: Bearer {jwt_token}'
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

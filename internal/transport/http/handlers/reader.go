@@ -30,11 +30,12 @@ func NewReaderController(service ReaderService) *ReaderController {
 // @Tags			Reader
 // @Accept			json
 // @Produce		json
+// @Security		BearerAuth
 // @Success		200	"aga"
 // @Failure		400	"Incorrect body\nRefresh token expired or incorrect"
 // @Failure		403	"Access denied"
 // @Failure		404	"Post not found"
-// @Router			/api/posts [get]
+// @Router			/posts [get]
 func (c *ReaderController) ViewSelectionHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user, ok := ctx.Value(types.CtxUser).(*dto.UserDB)
@@ -68,12 +69,13 @@ func (c *ReaderController) authorView(w http.ResponseWriter, r *http.Request) {
 // @Tags			Poster
 // @Accept			json
 // @Produce		json
+// @Security		BearerAuth
 // @Param			request	body		dto.CreatePostRequest	true	"Create post data"
 // @Success		201		{object}	dto.CreatePostResponse
 // @Failure		400		"Incorrect body"
 // @Failure		403		"Incorrect user"
 // @Failure		409		"Idempotency key already used"
-// @Router			/api/posts [post]
+// @Router			/posts [post]
 func (c *ReaderController) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user, ok := ctx.Value(types.CtxUser).(*dto.UserDB)

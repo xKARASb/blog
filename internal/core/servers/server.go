@@ -11,7 +11,6 @@ import (
 	"github.com/xkarasb/blog/internal/transport/http/middlewares"
 	"github.com/xkarasb/blog/internal/transport/http/routers"
 	"github.com/xkarasb/blog/pkg/db/postgres"
-	// Your module name + /docs
 )
 
 type HttpServerConfig struct {
@@ -23,6 +22,11 @@ type HttpServer struct {
 	cfg  *HttpServerConfig
 	http *http.Server
 }
+
+//	@securityDefinitions.apikey	BearerAuth
+//	@in							header
+//	@name						Authorization
+//	@description				Enter: Bearer {jwt_token}
 
 func NewHttpServer(cfg *HttpServerConfig, db *postgres.DB, isDoc bool) *HttpServer {
 	apiRouter := http.NewServeMux()

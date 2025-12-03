@@ -4,7 +4,7 @@
         "contact": {}
     },
     "paths": {
-        "/api/auth/login": {
+        "/auth/login": {
             "post": {
                 "description": "Login a user",
                 "consumes": [
@@ -44,7 +44,7 @@
                 }
             }
         },
-        "/api/auth/refresh-token": {
+        "/auth/refresh-token": {
             "post": {
                 "description": "Get access token by refresh token",
                 "consumes": [
@@ -81,7 +81,7 @@
                 }
             }
         },
-        "/api/auth/register": {
+        "/auth/register": {
             "post": {
                 "description": "Registrate a new user",
                 "consumes": [
@@ -121,8 +121,13 @@
                 }
             }
         },
-        "/api/post/{postId}": {
+        "/post/{postId}": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Edit post",
                 "consumes": [
                     "application/json"
@@ -171,8 +176,13 @@
                 }
             }
         },
-        "/api/post/{postId}/status": {
+        "/post/{postId}/status": {
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Publish post",
                 "consumes": [
                     "application/json"
@@ -222,8 +232,13 @@
                 }
             }
         },
-        "/api/posts": {
+        "/posts": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Read all posts",
                 "consumes": [
                     "application/json"
@@ -251,6 +266,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create new post",
                 "consumes": [
                     "application/json"
@@ -454,6 +474,14 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Enter: Bearer {jwt_token}",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

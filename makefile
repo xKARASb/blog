@@ -1,7 +1,8 @@
 .PHONY: swagger
 swagger: 
 	@echo "Build swagger API"
-	@swag init --parseDependency --parseInternal -g cmd/server/main.go -output ./docs  || true 
+	@swag fmt
+	@swag init --parseDependency --parseInternal -g ./internal/core/servers/server.go -output ./docs  || true 
 
 
 .PHONY: build
