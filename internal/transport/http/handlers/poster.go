@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"fmt"
+	"mime/multipart"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -15,6 +16,8 @@ import (
 type PosterService interface {
 	EditPost(userId, postId uuid.UUID, post *dto.EditPostRequest) (*dto.EditPostResponse, error)
 	PublishPost(userId, postId uuid.UUID, post *dto.PublishPostRequest) (*dto.PublishPostResponse, error)
+	AddImage(userId, postId uuid.UUID, file multipart.File, fileHeader *multipart.FileHeader) (*dto.AddImageResponse, error)
+	DeleteImage(userId, postId, imageId uuid.UUID) (*dto.DeleteImageResponse, error)
 }
 
 type PosterController struct {
@@ -25,8 +28,64 @@ func NewPosterController(service PosterService) *PosterController {
 	return &PosterController{service}
 }
 
+// @Description	Add Image
+// @Tags			Poster
+// @Accept			mpfd
+// @Produce		json
+// @Security		BearerAuth
+// @Param			postId	path		string	true	"Post ID"	format(uuid)
+// @Param			image	formData	file	true	"Image"
+// @Success		201		{object}	dto.AddImageResponse
+// @Failure		400		"Incorrect body\nRefresh token expired or incorrect"
+// @Failure		403		"Access denied"
+// @Failure		404		"Post not found"
+// @Router			/post/{postId}/images [post]“
 func (c *PosterController) AddImageHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Poster %s %s\n", r.Method, r.URL)
+	ctx := r.Context()
+	user, ok := ctx.Value(types.CtxUser).(*dto.UserDB)
+	if !ok {
+		w.WriteHeader(http.StatusForbidden)
+		fmt.Fprintln(w, "Incorrect user")
+		return
+	}
+
+	postId, err := uuid.Parse(r.PathValue("postId"))
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintln(w, "Post not found")
+		return
+	}
+	file, fileHeader, err := r.FormFile("image")
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadGateway)
+		fmt.Fprintln(w, "Some error while get file")
+		return
+	}
+
+	resp, err := c.service.AddImage(user.UserId, postId, file, fileHeader)
+
+	if err != nil {
+		switch err {
+		case errors.ErrorServiceNoAccess:
+			w.WriteHeader(http.StatusForbidden)
+			fmt.Fprintln(w, "Access denied")
+		case errors.ErrorServiceIncorrectData:
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintln(w, "Incorrect status")
+		case sql.ErrNoRows:
+			w.WriteHeader(http.StatusNotFound)
+			fmt.Fprintln(w, "Post not found")
+		default:
+			w.WriteHeader(http.StatusBadGateway)
+			fmt.Fprintln(w, "Something wrong")
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.MarshalToHTTPResponseWriter(resp, w)
 }
 
 // @Description	Edit post
@@ -86,8 +145,63 @@ func (c *PosterController) EditPostHandler(w http.ResponseWriter, r *http.Reques
 	json.MarshalToHTTPResponseWriter(resPost, w)
 }
 
+// @Description	Add Image
+// @Tags			Poster
+// @Produce		json
+// @Security		BearerAuth
+// @Param			postId	path		string	true	"Post ID"	format(uuid)
+// @Param			imageId	path		string	true	"Image ID"	format(uuid)
+// @Success		201		{object}	dto.DeleteImageResponse
+// @Failure		400		"Incorrect body\nRefresh token expired or incorrect"
+// @Failure		403		"Access denied"
+// @Failure		404		"Post/Image not found"
+// @Router			/post/{postId}/images/{imageId} [delete]“
 func (c *PosterController) DeleteImageHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Poster %s %s\n", r.Method, r.URL)
+	ctx := r.Context()
+	user, ok := ctx.Value(types.CtxUser).(*dto.UserDB)
+	if !ok {
+		w.WriteHeader(http.StatusForbidden)
+		fmt.Fprintln(w, "Incorrect user")
+		return
+	}
+
+	postId, err := uuid.Parse(r.PathValue("postId"))
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintln(w, "Post not found")
+		return
+	}
+	imageId, err := uuid.Parse(r.PathValue("imageId"))
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintln(w, "Image not found")
+		return
+	}
+
+	resp, err := c.service.DeleteImage(user.UserId, postId, imageId)
+
+	if err != nil {
+		switch err {
+		case errors.ErrorServiceNoAccess:
+			w.WriteHeader(http.StatusForbidden)
+			fmt.Fprintln(w, "Access denied")
+		case errors.ErrorServiceIncorrectData:
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintln(w, "Incorrect status")
+		case sql.ErrNoRows:
+			w.WriteHeader(http.StatusNotFound)
+			fmt.Fprintln(w, "Post not found")
+		default:
+			w.WriteHeader(http.StatusBadGateway)
+			fmt.Fprintln(w, "Something wrong")
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.MarshalToHTTPResponseWriter(resp, w)
 }
 
 // @Summary		Publicate post

@@ -11,6 +11,7 @@ import (
 	"github.com/xkarasb/blog/internal/transport/http/middlewares"
 	"github.com/xkarasb/blog/internal/transport/http/routers"
 	"github.com/xkarasb/blog/pkg/db/postgres"
+	"github.com/xkarasb/blog/pkg/storage/minio"
 )
 
 type HttpServerConfig struct {
@@ -28,14 +29,15 @@ type HttpServer struct {
 //	@name						Authorization
 //	@description				Enter: Bearer {jwt_token}
 
-func NewHttpServer(cfg *HttpServerConfig, db *postgres.DB, isDoc bool) *HttpServer {
+func NewHttpServer(cfg *HttpServerConfig, db *postgres.DB, storage *minio.MinIOClient, isDoc bool) *HttpServer {
 	apiRouter := http.NewServeMux()
 
 	dbRepo := repository.NewBlogRepository(db)
+	storRepo := repository.NewMinIORepository(storage)
 
 	authService := service.NewAuthService(dbRepo, "secret")
 	readerService := service.NewReaderService(dbRepo)
-	posterService := service.NewPosterService(dbRepo)
+	posterService := service.NewPosterService(dbRepo, storRepo)
 
 	authMMan := middlewares.NewAuthMiddlewareManager(authService) //AuthMiddleWareManager - создаёт объект, где хранится секрет, для более гибкой работы с мидлварами и передачи их в роутеры
 

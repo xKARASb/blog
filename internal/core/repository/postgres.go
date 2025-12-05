@@ -11,17 +11,17 @@ import (
 	"github.com/xkarasb/blog/pkg/types"
 )
 
-type BlogRepository struct {
+type PostgresRepository struct {
 	DB *postgres.DB
 }
 
-func NewBlogRepository(db *postgres.DB) *BlogRepository {
-	return &BlogRepository{
+func NewBlogRepository(db *postgres.DB) *PostgresRepository {
+	return &PostgresRepository{
 		DB: db,
 	}
 }
 
-func (rep *BlogRepository) AddNewUser(email, password_hash, role, refreshToken string) (*dto.UserDB, error) {
+func (rep *PostgresRepository) AddNewUser(email, password_hash, role, refreshToken string) (*dto.UserDB, error) {
 	user := &dto.UserDB{}
 
 	query := `INSERT INTO users (email, password_hash, role, refresh_token, refresh_token_expiry_time) VALUES ($1, $2, $3, $4, $5) RETURNING *;`
@@ -38,7 +38,7 @@ func (rep *BlogRepository) AddNewUser(email, password_hash, role, refreshToken s
 	return user, nil
 }
 
-func (rep *BlogRepository) GetUserByEmail(email string) (*dto.UserDB, error) {
+func (rep *PostgresRepository) GetUserByEmail(email string) (*dto.UserDB, error) {
 	user := &dto.UserDB{}
 
 	query := `SELECT * FROM users WHERE email = $1;`
@@ -49,7 +49,7 @@ func (rep *BlogRepository) GetUserByEmail(email string) (*dto.UserDB, error) {
 	return user, nil
 }
 
-func (rep *BlogRepository) GetUserById(id uuid.UUID) (*dto.UserDB, error) {
+func (rep *PostgresRepository) GetUserById(id uuid.UUID) (*dto.UserDB, error) {
 	user := &dto.UserDB{}
 
 	query := `SELECT * FROM users WHERE user_id = $1;`
@@ -60,7 +60,7 @@ func (rep *BlogRepository) GetUserById(id uuid.UUID) (*dto.UserDB, error) {
 	return user, nil
 }
 
-func (rep *BlogRepository) UpdateRefreshToken(id uuid.UUID, refreshToken string) (*dto.UserDB, error) {
+func (rep *PostgresRepository) UpdateRefreshToken(id uuid.UUID, refreshToken string) (*dto.UserDB, error) {
 	user := &dto.UserDB{}
 
 	query := `UPDATE users SET refresh_token = $2 WHERE user_id = $1 RETURNING *;`
@@ -71,7 +71,7 @@ func (rep *BlogRepository) UpdateRefreshToken(id uuid.UUID, refreshToken string)
 	return user, nil
 }
 
-func (rep *BlogRepository) GetRefreshToken(id uuid.UUID) (string, error) {
+func (rep *PostgresRepository) GetRefreshToken(id uuid.UUID) (string, error) {
 	var token string
 	query := `SELECT refresh_token FROM users WHERE user_id = $1;`
 	err := rep.DB.Get(&token, query, id)
@@ -81,7 +81,7 @@ func (rep *BlogRepository) GetRefreshToken(id uuid.UUID) (string, error) {
 	return token, nil
 }
 
-func (rep *BlogRepository) GetPostByIdempotencyKey(idempotencyKey string) (*dto.PostDB, error) {
+func (rep *PostgresRepository) GetPostByIdempotencyKey(idempotencyKey string) (*dto.PostDB, error) {
 	post := &dto.PostDB{}
 
 	query := `SELECT * FROM posts WHERE idempotency_key = $1;`
@@ -92,7 +92,7 @@ func (rep *BlogRepository) GetPostByIdempotencyKey(idempotencyKey string) (*dto.
 	return post, nil
 }
 
-func (rep *BlogRepository) CreatePost(
+func (rep *PostgresRepository) CreatePost(
 	authorId uuid.UUID, idempotencyKey, title, content string) (*dto.PostDB, error) {
 	post := &dto.PostDB{}
 
@@ -109,7 +109,7 @@ func (rep *BlogRepository) CreatePost(
 	return post, nil
 }
 
-func (rep *BlogRepository) GetPostById(id uuid.UUID) (*dto.PostDB, error) {
+func (rep *PostgresRepository) GetPostById(id uuid.UUID) (*dto.PostDB, error) {
 	post := &dto.PostDB{}
 
 	query := `SELECT * FROM posts WHERE post_id = $1;`
@@ -120,7 +120,7 @@ func (rep *BlogRepository) GetPostById(id uuid.UUID) (*dto.PostDB, error) {
 	return post, nil
 }
 
-func (rep *BlogRepository) UpdatePost(id uuid.UUID, title, content string, status types.PostStatus) (*dto.PostDB, error) {
+func (rep *PostgresRepository) UpdatePost(id uuid.UUID, title, content string, status types.PostStatus) (*dto.PostDB, error) {
 	post := &dto.PostDB{}
 	query := `UPDATE posts SET title = $2, content = $3, status = $4 WHERE post_id = $1 RETURNING *;`
 	err := rep.DB.Get(post, query, id, title, content, status)
@@ -128,4 +128,31 @@ func (rep *BlogRepository) UpdatePost(id uuid.UUID, title, content string, statu
 		return nil, err
 	}
 	return post, nil
+}
+
+func (rep *PostgresRepository) CreateImage(imageId, postId uuid.UUID, imageUrl string) (*dto.ImageDB, error) {
+	image := &dto.ImageDB{}
+
+	query := `INSERT INTO images (image_id, post_id, image_url) VALUES ($1, $2, $3) RETURNING *;`
+
+	err := rep.DB.Get(image, query, imageId, postId, imageUrl)
+	if err != nil {
+		pgErr, ok := err.(*pq.Error)
+		if ok && pgErr.Code == "23505" {
+			return nil, errors.ErrorRepositoryUserAlreadyExsist
+		}
+		return nil, err
+	}
+	return image, nil
+}
+
+func (rep *PostgresRepository) DeleteImage(imageId uuid.UUID) (*dto.ImageDB, error) {
+	image := &dto.ImageDB{}
+	query := `DELETE FROM images WHERE image_id = $1 RETURNING *`
+	err := rep.DB.Get(image, query, imageId)
+	if err != nil {
+		return nil, err
+	}
+	return image, nil
+
 }

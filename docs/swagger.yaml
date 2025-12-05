@@ -1,4 +1,11 @@
 definitions:
+  AddImageResonse:
+    properties:
+      image_id:
+        type: string
+      image_url:
+        type: string
+    type: object
   CreatePostRequest:
     description: Request payload for creating a new post
     properties:
@@ -13,6 +20,11 @@ definitions:
     description: Response with ID of the created post
     properties:
       post_id:
+        type: string
+    type: object
+  DeleteImageResonse:
+    properties:
+      image_id:
         type: string
     type: object
   EditPostRequest:
@@ -217,6 +229,73 @@ paths:
           description: Access denied
         "404":
           description: Post not found
+      security:
+      - BearerAuth: []
+      tags:
+      - Poster
+  /post/{postId}/images:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Add Image
+      parameters:
+      - description: Post ID
+        format: uuid
+        in: path
+        name: postId
+        required: true
+        type: string
+      - description: Image
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/AddImageResonse'
+        "400":
+          description: Incorrect body\nRefresh token expired or incorrect
+        "403":
+          description: Access denied
+        "404":
+          description: Post not found
+      security:
+      - BearerAuth: []
+      tags:
+      - Poster
+  /post/{postId}/images/{imageId}:
+    delete:
+      description: Add Image
+      parameters:
+      - description: Post ID
+        format: uuid
+        in: path
+        name: postId
+        required: true
+        type: string
+      - description: Image ID
+        format: uuid
+        in: path
+        name: imageId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/DeleteImageResonse'
+        "400":
+          description: Incorrect body\nRefresh token expired or incorrect
+        "403":
+          description: Access denied
+        "404":
+          description: Post/Image not found
       security:
       - BearerAuth: []
       tags:

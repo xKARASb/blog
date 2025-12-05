@@ -13,7 +13,7 @@ func GetPosterRouter(service *service.PosterService) *http.ServeMux {
 
 	router.HandleFunc("POST /post/{postId}/images", controller.AddImageHandler)
 	router.HandleFunc("PUT /post/{postId}", controller.EditPostHandler)
-	router.HandleFunc("DELTE /post/{postId}/images/{imageId}", controller.DeleteImageHandler)
+	router.HandleFunc("DELETE /post/{postId}/images/{imageId}", controller.DeleteImageHandler)
 	router.HandleFunc("PATCH /post/{postId}/status", controller.PublishHandler)
 
 	return router

@@ -187,6 +187,110 @@ const docTemplate = `{
                 }
             }
         },
+        "/post/{postId}/images": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Add Image",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Poster"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Post ID",
+                        "name": "postId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Image",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/AddImageResonse"
+                        }
+                    },
+                    "400": {
+                        "description": "Incorrect body\\nRefresh token expired or incorrect"
+                    },
+                    "403": {
+                        "description": "Access denied"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                }
+            }
+        },
+        "/post/{postId}/images/{imageId}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Add Image",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Poster"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Post ID",
+                        "name": "postId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Image ID",
+                        "name": "imageId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/DeleteImageResonse"
+                        }
+                    },
+                    "400": {
+                        "description": "Incorrect body\\nRefresh token expired or incorrect"
+                    },
+                    "403": {
+                        "description": "Access denied"
+                    },
+                    "404": {
+                        "description": "Post/Image not found"
+                    }
+                }
+            }
+        },
         "/post/{postId}/status": {
             "patch": {
                 "security": [
@@ -325,6 +429,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "AddImageResonse": {
+            "type": "object",
+            "properties": {
+                "image_id": {
+                    "type": "string"
+                },
+                "image_url": {
+                    "type": "string"
+                }
+            }
+        },
         "CreatePostRequest": {
             "description": "Request payload for creating a new post",
             "type": "object",
@@ -345,6 +460,14 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "post_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "DeleteImageResonse": {
+            "type": "object",
+            "properties": {
+                "image_id": {
                     "type": "string"
                 }
             }
