@@ -19,6 +19,9 @@ run: json swagger
 	@echo "Run app.."
 	@go run "$(CURDIR)/cmd/server/main.go"
 
+docker-dev: json swagger
+	docker-compose up --build
+
 docker-up:
 	docker-compose up -d
 

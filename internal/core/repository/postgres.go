@@ -157,6 +157,18 @@ func (rep *PostgresRepository) DeleteImage(imageId uuid.UUID) (*dto.ImageDB, err
 
 }
 
+func (rep *PostgresRepository) GetPostImages(postId uuid.UUID) ([]*dto.ImageDB, error) {
+	var images []*dto.ImageDB
+
+	query := `SELECT * FROM images WHERE post_id = $1;`
+	err := rep.DB.Select(&images, query, postId)
+
+	if err != nil {
+		return nil, err
+	}
+	return images, nil
+}
+
 func (rep *PostgresRepository) GetPublishedPosts() ([]*dto.PostUserDB, error) {
 	var posts []*dto.PostUserDB
 

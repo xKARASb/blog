@@ -18,6 +18,7 @@ type ReaderRepository interface {
 	) (*dto.PostDB, error)
 	GetPublishedPosts() ([]*dto.PostUserDB, error)
 	GetUserPosts(userId uuid.UUID) ([]*dto.PostUserDB, error)
+	GetPostImages(postId uuid.UUID) ([]*dto.ImageDB, error)
 }
 
 type ReaderService struct {
@@ -66,9 +67,28 @@ func (s *ReaderService) GetPublishedPosts() ([]*dto.GetPostResponse, error) {
 		return nil, err
 	}
 
+	return s.proccessPostsToResponse(posts)
+}
+
+// union posts with images
+func (s *ReaderService) proccessPostsToResponse(posts []*dto.PostUserDB) ([]*dto.GetPostResponse, error) {
+
 	res := make([]*dto.GetPostResponse, len(posts))
 
 	for i, raw := range posts {
+		rawImages, err := s.rep.GetPostImages(raw.PostId)
+		if err != nil {
+			return nil, err
+		}
+
+		images := make([]dto.AddImageResponse, len(rawImages))
+		for i, el := range rawImages {
+			images[i] = dto.AddImageResponse{
+				ImageId:  el.ImageId,
+				ImageUrl: el.ImageUrl,
+			}
+		}
+
 		res[i] = &dto.GetPostResponse{
 			PostId: raw.PostId,
 			Author: dto.UserResponse{
@@ -78,10 +98,12 @@ func (s *ReaderService) GetPublishedPosts() ([]*dto.GetPostResponse, error) {
 			Title:     raw.Title,
 			Content:   raw.Content,
 			Status:    raw.Status,
+			Images:    images,
 			CreatedAt: raw.CreatedAt,
 			UpdatedAt: raw.UpdatedAt,
 		}
 	}
+
 	return res, nil
 }
 
@@ -92,21 +114,5 @@ func (s *ReaderService) GetAuthorPosts(authorId uuid.UUID) ([]*dto.GetPostRespon
 		return nil, err
 	}
 
-	res := make([]*dto.GetPostResponse, len(posts))
-
-	for i, raw := range posts {
-		res[i] = &dto.GetPostResponse{
-			PostId: raw.PostId,
-			Author: dto.UserResponse{
-				UserId: raw.AuthorId,
-				Email:  raw.Email,
-			},
-			Title:     raw.Title,
-			Content:   raw.Content,
-			Status:    raw.Status,
-			CreatedAt: raw.CreatedAt,
-			UpdatedAt: raw.UpdatedAt,
-		}
-	}
-	return res, nil
+	return s.proccessPostsToResponse(posts)
 }

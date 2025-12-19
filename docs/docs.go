@@ -532,6 +532,12 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/AddImageResonse"
+                    }
+                },
                 "post_id": {
                     "type": "string"
                 },

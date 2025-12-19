@@ -746,6 +746,33 @@ func easyjson56de76c1DecodeGithubComXkarasbBlogInternalCoreDto9(in *jlexer.Lexer
 			} else {
 				out.Status = types.PostStatus(in.String())
 			}
+		case "images":
+			if in.IsNull() {
+				in.Skip()
+				out.Images = nil
+			} else {
+				in.Delim('[')
+				if out.Images == nil {
+					if !in.IsDelim(']') {
+						out.Images = make([]AddImageResponse, 0, 2)
+					} else {
+						out.Images = []AddImageResponse{}
+					}
+				} else {
+					out.Images = (out.Images)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v1 AddImageResponse
+					if in.IsNull() {
+						in.Skip()
+					} else {
+						(v1).UnmarshalEasyJSON(in)
+					}
+					out.Images = append(out.Images, v1)
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
 		case "created_at":
 			if in.IsNull() {
 				in.Skip()
@@ -800,6 +827,22 @@ func easyjson56de76c1EncodeGithubComXkarasbBlogInternalCoreDto9(out *jwriter.Wri
 		const prefix string = ",\"status\":"
 		out.RawString(prefix)
 		out.String(string(in.Status))
+	}
+	{
+		const prefix string = ",\"images\":"
+		out.RawString(prefix)
+		if in.Images == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
+			out.RawString("null")
+		} else {
+			out.RawByte('[')
+			for v2, v3 := range in.Images {
+				if v2 > 0 {
+					out.RawByte(',')
+				}
+				(v3).MarshalEasyJSON(out)
+			}
+			out.RawByte(']')
+		}
 	}
 	{
 		const prefix string = ",\"created_at\":"
