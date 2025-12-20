@@ -7,9 +7,9 @@ import (
 
 // @Description	Request payload for registering a new user
 type RegistrateUserRequest struct {
-	Email    string     `json:"email"`
-	Password string     `json:"password"`
-	Role     types.Role `json:"role"`
+	Email    string     `json:"email" validate:"required,email"`
+	Password string     `json:"password" validate:"required,min=8"`
+	Role     types.Role `json:"role" validate:"required,oneof=reader author"`
 } //	@name	UserRegistrationRequest
 
 // @Description	Response with authentication tokens after registration
@@ -21,8 +21,8 @@ type RegistrateUserResponse struct {
 
 // @Description	Request payload for user authentication
 type LoginUserRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=8"`
 } //	@name	UserLoginRequest
 
 // @Description	Response with authentication tokens after login
@@ -34,7 +34,7 @@ type LoginUserResponse struct {
 
 // @Description	Request to refresh access token using refresh token
 type RefreshRequest struct {
-	RefreshToken string `json:"refresh_token"`
+	RefreshToken string `json:"refresh_token" validate:"required"`
 } //	@name	TokenRefreshRequest
 
 // @Description	Response with new access token

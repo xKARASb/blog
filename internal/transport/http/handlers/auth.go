@@ -7,6 +7,7 @@ import (
 
 	"github.com/xkarasb/blog/internal/core/dto"
 	"github.com/xkarasb/blog/pkg/errors"
+	"github.com/xkarasb/blog/pkg/utils"
 )
 
 type AuthService interface {
@@ -36,16 +37,22 @@ func NewAuthController(service AuthService) *AuthController {
 // @Router			/auth/register [post]
 func (c *AuthController) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	reqUser := &dto.RegistrateUserRequest{}
-
 	if err := json.UnmarshalFromReader(r.Body, reqUser); err != nil {
 		http.Error(w, errors.ErrorHttpIncorrectBody.Error(), http.StatusBadRequest)
 		return
 	}
+
+	if err := utils.Validate(reqUser); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	resp, err := c.service.RegistrateUser(reqUser)
 	if err != nil {
-		if err == errors.ErrorRepositoryUserAlreadyExsist {
+		switch err {
+		case errors.ErrorRepositoryUserAlreadyExsist:
 			http.Error(w, err.Error(), http.StatusForbidden)
-		} else {
+		default:
 			http.Error(w, err.Error(), http.StatusBadGateway)
 		}
 		return
@@ -70,12 +77,17 @@ func (c *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, errors.ErrorHttpIncorrectBody.Error(), http.StatusBadRequest)
 		return
 	}
+	if err := utils.Validate(reqUser); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 	resp, err := c.service.LoginUser(reqUser)
 
 	if err != nil {
-		if err == errors.ErrorRepositoryEmailNotExsist {
-			http.Error(w, errors.ErrorHttpIncorrectEmail.Error(), http.StatusForbidden)
-		} else {
+		switch err {
+		case errors.ErrorRepositoryEmailNotExsist:
+			http.Error(w, err.Error(), http.StatusForbidden)
+		default:
 			http.Error(w, err.Error(), http.StatusBadGateway)
 		}
 		return
@@ -100,6 +112,12 @@ func (c *AuthController) RefreshHandler(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, errors.ErrorHttpIncorrectBody.Error(), http.StatusBadRequest)
 		return
 	}
+
+	if err := utils.Validate(req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	resp, err := c.service.RefreshToken(req)
 
 	if err != nil {

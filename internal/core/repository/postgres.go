@@ -29,10 +29,15 @@ func (rep *PostgresRepository) AddNewUser(email, password_hash, role, refreshTok
 
 	err := rep.DB.Get(user, query, email, password_hash, role, refreshToken, refreshTokenExpire)
 	if err != nil {
-		pgErr, ok := err.(*pq.Error)
-		if ok && pgErr.Code == "23505" {
-			return nil, errors.ErrorRepositoryUserAlreadyExsist
+		if pgErr, ok := err.(*pq.Error); ok {
+			switch pgErr.Code {
+			case "23505":
+				return nil, errors.ErrorRepositoryUserAlreadyExsist
+			case "23514":
+				return nil, errors.ErrorRepositoryBadRole
+			}
 		}
+
 		return nil, err
 	}
 	return user, nil

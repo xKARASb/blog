@@ -3,3 +3,4 @@ docker.env
 go.sum
 .vscode
 bin
+cover.out
