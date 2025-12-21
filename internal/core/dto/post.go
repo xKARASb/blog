@@ -40,9 +40,9 @@ type GetPostResponse struct {
 
 // @Description	Request payload for creating a new post
 type CreatePostRequest struct {
-	IdempotencyKey string `json:"idempotency_key"`
-	Title          string `json:"title"`
-	Content        string `json:"content"`
+	IdempotencyKey string `json:"idempotency_key" validate:"required"`
+	Title          string `json:"title" validate:"required"`
+	Content        string `json:"content" validate:"required"`
 } //	@name	CreatePostRequest
 
 // @Description	Response with ID of the created post
@@ -52,8 +52,8 @@ type CreatePostResponse struct {
 
 // @Description	Request payload for editing a post
 type EditPostRequest struct {
-	Title   string `json:"title"`
-	Content string `json:"content"`
+	Title   string `json:"title" validate:"required"`
+	Content string `json:"content" validate:"required"`
 } //	@name	EditPostRequest
 
 // @Description	Response with updated post details
@@ -70,7 +70,7 @@ type EditPostResponse struct {
 
 // @Description	Request to change post status (publish/unpublish)
 type PublishPostRequest struct {
-	Status types.PostStatus `json:"status"`
+	Status types.PostStatus `json:"status" validate:"required,oneof=published draft"`
 } //	@name	UpdatePostStatusRequest
 
 // @Description	Response with ID of the published post

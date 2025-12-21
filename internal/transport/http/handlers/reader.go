@@ -8,6 +8,7 @@ import (
 	"github.com/xkarasb/blog/internal/core/dto"
 	"github.com/xkarasb/blog/pkg/errors"
 	"github.com/xkarasb/blog/pkg/types"
+	"github.com/xkarasb/blog/pkg/utils"
 )
 
 type ReaderService interface {
@@ -107,7 +108,13 @@ func (c *ReaderController) CreatePostHandler(w http.ResponseWriter, r *http.Requ
 	if err := json.NewDecoder(r.Body).Decode(reqPost); err != nil {
 		http.Error(w, errors.ErrorHttpIncorrectBody.Error(), http.StatusBadRequest)
 		return
+
 	}
+	if err := utils.Validate(reqPost); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	resPost, err := c.service.NewPost(user.UserId, reqPost)
 
 	if err != nil {

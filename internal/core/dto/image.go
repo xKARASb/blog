@@ -15,10 +15,10 @@ type ImageDB struct {
 }
 
 type AddImageResponse struct {
-	ImageId  uuid.UUID `json:"image_id"`
-	ImageUrl string    `json:"image_url"`
+	ImageId  uuid.UUID `json:"image_id" validate:"required,uuid"`
+	ImageUrl string    `json:"image_url" validate:"required,url"`
 } //	@name	AddImageResonse
 
 type DeleteImageResponse struct {
-	ImageId uuid.UUID `json:"image_id"`
+	ImageId uuid.UUID `json:"image_id" validate:"required,uuid"`
 } //	@name	DeleteImageResonse

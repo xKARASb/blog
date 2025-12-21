@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	gerrors "errors"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -25,7 +24,6 @@ type MockAuthService struct {
 
 func (m *MockAuthService) RegistrateUser(user *dto.RegistrateUserRequest) (*dto.RegistrateUserResponse, error) {
 	args := m.Called(user)
-	fmt.Println(args)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
@@ -162,7 +160,6 @@ func TestAuthController_RegisterHandler(t *testing.T) {
 
 			controller.RegisterHandler(rr, req)
 
-			fmt.Println(tt.expectedStatus, rr.Code)
 			assert.Equal(t, tt.expectedStatus, rr.Code)
 
 			if tt.checkBody != nil {
@@ -183,9 +180,8 @@ func TestAuthController_LoginHandler(t *testing.T) {
 		setupMock      func(*MockAuthService)
 		expectedStatus int
 		checkBody      func(*testing.T, string)
-		shouldCallMock bool // Добавляем флаг для ясности
+		shouldCallMock bool
 	}{
-		// Успешные сценарии
 		{
 			name: "successful login",
 			requestBody: dto.LoginUserRequest{
@@ -273,7 +269,6 @@ func TestAuthController_LoginHandler(t *testing.T) {
 			shouldCallMock: false,
 		},
 
-		// Ошибки сервиса (сервис ДОЛЖЕН вызываться)
 		{
 			name: "user not found",
 			requestBody: dto.LoginUserRequest{
@@ -300,7 +295,7 @@ func TestAuthController_LoginHandler(t *testing.T) {
 				m.On("LoginUser", mock.AnythingOfType("*dto.LoginUserRequest")).
 					Return(nil, errors.ErrorRepositoryEmailNotExsist)
 			},
-			expectedStatus: http.StatusForbidden, // Поскольку это default case
+			expectedStatus: http.StatusForbidden,
 			shouldCallMock: true,
 			checkBody: func(t *testing.T, body string) {
 				assert.Contains(t, body, errors.ErrorRepositoryEmailNotExsist.Error())
@@ -323,7 +318,6 @@ func TestAuthController_LoginHandler(t *testing.T) {
 			name:        "malformed JSON with extra fields",
 			requestBody: `{"email": "user@example.com", "password": "Password123!", "extra": "field"}`,
 			setupMock: func(m *MockAuthService) {
-				// Сервис должен вызваться с валидными данными
 				m.On("LoginUser", mock.MatchedBy(func(req *dto.LoginUserRequest) bool {
 					return req.Email == "user@example.com" && req.Password == "Password123!"
 				})).Return(&dto.LoginUserResponse{
@@ -520,7 +514,7 @@ func TestAuthController_RefreshHandler(t *testing.T) {
 			},
 			setupMock: func(m *MockAuthService) {
 				m.On("RefreshToken", mock.AnythingOfType("*dto.RefreshRequest")).
-					Return(nil, errors.ErrorInvalidToken) // Тот же тип ошибки для истекшего токена
+					Return(nil, errors.ErrorInvalidToken)
 			},
 			expectedStatus: http.StatusBadRequest,
 			shouldCallMock: true,
@@ -549,7 +543,7 @@ func TestAuthController_RefreshHandler(t *testing.T) {
 				m.On("RefreshToken", mock.AnythingOfType("*dto.RefreshRequest")).
 					Return(nil, errors.ErrorHttpIncorrectUser)
 			},
-			expectedStatus: http.StatusBadGateway, // default case
+			expectedStatus: http.StatusBadGateway,
 			shouldCallMock: true,
 			checkBody: func(t *testing.T, body string) {
 				assert.Contains(t, body, errors.ErrorHttpIncorrectUser.Error())

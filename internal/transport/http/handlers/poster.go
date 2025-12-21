@@ -10,6 +10,7 @@ import (
 	"github.com/xkarasb/blog/internal/core/dto"
 	"github.com/xkarasb/blog/pkg/errors"
 	"github.com/xkarasb/blog/pkg/types"
+	"github.com/xkarasb/blog/pkg/utils"
 )
 
 type PosterService interface {
@@ -102,6 +103,11 @@ func (c *PosterController) EditPostHandler(w http.ResponseWriter, r *http.Reques
 	reqPost := &dto.EditPostRequest{}
 	if err := json.UnmarshalFromReader(r.Body, reqPost); err != nil {
 		http.Error(w, errors.ErrorHttpIncorrectBody.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := utils.Validate(reqPost); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -205,6 +211,11 @@ func (c *PosterController) PublishHandler(w http.ResponseWriter, r *http.Request
 	reqPost := &dto.PublishPostRequest{}
 	if err := json.UnmarshalFromReader(r.Body, reqPost); err != nil {
 		http.Error(w, errors.ErrorHttpIncorrectBody.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := utils.Validate(reqPost); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
