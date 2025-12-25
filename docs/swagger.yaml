@@ -5,6 +5,9 @@ definitions:
         type: string
       image_url:
         type: string
+    required:
+    - image_id
+    - image_url
     type: object
   CreatePostRequest:
     description: Request payload for creating a new post
@@ -15,6 +18,10 @@ definitions:
         type: string
       title:
         type: string
+    required:
+    - content
+    - idempotency_key
+    - title
     type: object
   CreatePostResponse:
     description: Response with ID of the created post
@@ -26,6 +33,8 @@ definitions:
     properties:
       image_id:
         type: string
+    required:
+    - image_id
     type: object
   EditPostRequest:
     description: Request payload for editing a post
@@ -34,6 +43,9 @@ definitions:
         type: string
       title:
         type: string
+    required:
+    - content
+    - title
     type: object
   PostDetails:
     description: Response with updated post details
@@ -81,6 +93,8 @@ definitions:
     properties:
       refresh_token:
         type: string
+    required:
+    - refresh_token
     type: object
   TokenRefreshResponse:
     description: Response with new access token
@@ -108,7 +122,13 @@ definitions:
     description: Request to change post status (publish/unpublish)
     properties:
       status:
-        $ref: '#/definitions/TypePostStatus'
+        allOf:
+        - $ref: '#/definitions/TypePostStatus'
+        enum:
+        - published
+        - draft
+    required:
+    - status
     type: object
   UserLoginRequest:
     description: Request payload for user authentication
@@ -116,7 +136,11 @@ definitions:
       email:
         type: string
       password:
+        minLength: 8
         type: string
+    required:
+    - email
+    - password
     type: object
   UserLoginResponse:
     description: Response with authentication tokens after login
@@ -134,9 +158,18 @@ definitions:
       email:
         type: string
       password:
+        minLength: 8
         type: string
       role:
-        $ref: '#/definitions/TypeUserRole'
+        allOf:
+        - $ref: '#/definitions/TypeUserRole'
+        enum:
+        - reader
+        - author
+    required:
+    - email
+    - password
+    - role
     type: object
   UserRegistrationResponse:
     description: Response with authentication tokens after registration

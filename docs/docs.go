@@ -437,6 +437,10 @@ const docTemplate = `{
     "definitions": {
         "AddImageResonse": {
             "type": "object",
+            "required": [
+                "image_id",
+                "image_url"
+            ],
             "properties": {
                 "image_id": {
                     "type": "string"
@@ -449,6 +453,11 @@ const docTemplate = `{
         "CreatePostRequest": {
             "description": "Request payload for creating a new post",
             "type": "object",
+            "required": [
+                "content",
+                "idempotency_key",
+                "title"
+            ],
             "properties": {
                 "content": {
                     "type": "string"
@@ -472,6 +481,9 @@ const docTemplate = `{
         },
         "DeleteImageResonse": {
             "type": "object",
+            "required": [
+                "image_id"
+            ],
             "properties": {
                 "image_id": {
                     "type": "string"
@@ -481,6 +493,10 @@ const docTemplate = `{
         "EditPostRequest": {
             "description": "Request payload for editing a post",
             "type": "object",
+            "required": [
+                "content",
+                "title"
+            ],
             "properties": {
                 "content": {
                     "type": "string"
@@ -555,6 +571,9 @@ const docTemplate = `{
         "TokenRefreshRequest": {
             "description": "Request to refresh access token using refresh token",
             "type": "object",
+            "required": [
+                "refresh_token"
+            ],
             "properties": {
                 "refresh_token": {
                     "type": "string"
@@ -595,21 +614,37 @@ const docTemplate = `{
         "UpdatePostStatusRequest": {
             "description": "Request to change post status (publish/unpublish)",
             "type": "object",
+            "required": [
+                "status"
+            ],
             "properties": {
                 "status": {
-                    "$ref": "#/definitions/TypePostStatus"
+                    "enum": [
+                        "published",
+                        "draft"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/TypePostStatus"
+                        }
+                    ]
                 }
             }
         },
         "UserLoginRequest": {
             "description": "Request payload for user authentication",
             "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 8
                 }
             }
         },
@@ -631,15 +666,29 @@ const docTemplate = `{
         "UserRegistrationRequest": {
             "description": "Request payload for registering a new user",
             "type": "object",
+            "required": [
+                "email",
+                "password",
+                "role"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 8
                 },
                 "role": {
-                    "$ref": "#/definitions/TypeUserRole"
+                    "enum": [
+                        "reader",
+                        "author"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/TypeUserRole"
+                        }
+                    ]
                 }
             }
         },

@@ -2,6 +2,7 @@ package servers
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -18,6 +19,7 @@ type HttpServerConfig struct {
 	Address string `env:"ADDRESS" env-default:"127.0.0.1"`
 	Port    int    `env:"PORT" env-default:"8080"`
 	Secret  string `env:"SECRET" env-default:"secret"`
+	Docs    bool   `env:"DOCS" env-default:"TRUE"`
 }
 
 type HttpServer struct {
@@ -68,7 +70,7 @@ func NewHttpServer(cfg HttpServerConfig, db *postgres.DB, storage *minio.MinIOCl
 
 		http.Handle("/swagger/", httpSwagger.WrapHandler)
 	}
-	fmt.Println(server.Addr)
+	slog.Info("Start listening http on", slog.String("addr", server.Addr))
 
 	return &HttpServer{
 		&cfg,

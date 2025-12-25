@@ -18,7 +18,7 @@ func main() {
 		panic(err)
 	}
 
-	serv := servers.NewHttpServer(appCfg.HttpServerConfig, db, storage, true)
+	serv := servers.NewHttpServer(appCfg.HttpServerConfig, db, storage, appCfg.Docs)
 
 	if err = serv.Start(); err != nil {
 		slog.Error(err.Error())

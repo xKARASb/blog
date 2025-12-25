@@ -35,8 +35,8 @@ services:
     volumes:
       - minio_data:/data
     ports:
-      - "9000:9000"  # API port
-      - "9001:9001"  # Console port
+      - "${MINIO_API_PORT_EXPOSE:-9000}:9000"  # API port
+      - "${MINIO_CONSOLE_PORT_EXPOSE:-9001}:9001"  # Console port
     networks:
       - app-network
     healthcheck:
@@ -57,12 +57,12 @@ services:
       POSTGRES_HOST: ${POSTGRES_HOST:-blog}
       POSTGRES_PORT: ${POSTGRES_PORT:-blog}
       POSTGRES_DB: ${POSTGRES_DB:-blog}
-      MINIO_ENDPOINT: minio:9000
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio:9000}
       MINIO_ACCESSKEY: ${MINIO_ACCESSKEY:-minioadmin}
       MINIO_SECRET: ${MINIO_SECRET:-minioadmin}
       MINIO_SSL: ${MINIO_SSL:-FALSE}
       MINIO_BUCKET: ${MINIO_BUCKET:-images}
-      ADDRESS: 0.0.0.0:8080
+      ADDRESS: ${ADDRESS:-0.0.0.0:8080}
     depends_on:
       postgres:
         condition: service_healthy
@@ -70,8 +70,6 @@ services:
         condition: service_started
     networks:
       - app-network
-    expose:
-      - "8080"
 
   nginx:
     image: nginx:alpine
