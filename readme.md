@@ -38,9 +38,9 @@ Ensure you have the following installed:
 
 ## ⚙️ Configuration
 
-1. Clone the [repository](https://github.com/xKARASb/GoBlog).
+1. Clone the [repository](https://github.com/xKARASb/blog).
     ```bash
-    git clone https://github.com/xKARASb/GoBlog && cd GoBlog
+    git clone https://github.com/xKARASb/blog && cd blog
     ```
 2. Create a `.env` and `docker.env` file based on the provided example:
    ```bash
